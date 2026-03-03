@@ -33,8 +33,8 @@ flutter run
 ```
 
 ## 연결 주소
-- iOS/macOS: `http://localhost:3001`
-- Android Emulator: `http://10.0.2.2:3001`
+- iOS/macOS: `https://dotdotdot.onrender.com`
+- Android Emulator: `https://dotdotdot.onrender.com`
 
 (코드 위치: `lib/main.dart` 의 `_socketUrl` getter)
 

@@ -18,14 +18,33 @@ io.on('connection', (socket) => {
 
   socket.on('join_room', ({ roomId }) => {
     if (!roomId) return;
+
+    // 재입장 시 이전 room 잔존으로 꼬이는 현상 방지
+    for (const r of socket.rooms) {
+      if (r !== socket.id) socket.leave(r);
+    }
+
     socket.join(roomId);
+    socket.data.roomId = roomId;
+    socket.data.nickname = nickname;
+    socket.emit('joined_room', { roomId, ok: true });
     socket.to(roomId).emit('typing', { nickname, typing: false });
   });
 
-  socket.on('leave_room', ({ roomId }) => {
+  socket.on('leave_room', ({ roomId, nickname: leaveNick }) => {
     if (!roomId) return;
+
+    const who = leaveNick || socket.data.nickname || nickname;
+    io.to(roomId).emit('new_message', {
+      roomId,
+      nickname: 'SYSTEM',
+      text: `${who}님이 퇴장하였습니다.`,
+      createdAt: new Date().toISOString(),
+    });
+
     socket.leave(roomId);
-    socket.to(roomId).emit('typing', { nickname, typing: false });
+    socket.data.roomId = null;
+    socket.to(roomId).emit('typing', { nickname: who, typing: false });
   });
 
   socket.on('typing', ({ roomId, nickname, typing }) => {
@@ -49,6 +68,17 @@ io.on('connection', (socket) => {
   });
 
   socket.on('disconnect', () => {
+    const roomId = socket.data.roomId;
+    const who = socket.data.nickname || nickname;
+    if (roomId) {
+      io.to(roomId).emit('new_message', {
+        roomId,
+        nickname: 'SYSTEM',
+        text: `${who}님이 퇴장하였습니다.`,
+        createdAt: new Date().toISOString(),
+      });
+      socket.to(roomId).emit('typing', { nickname: who, typing: false });
+    }
     console.log('disconnect:', socket.id);
   });
 });
