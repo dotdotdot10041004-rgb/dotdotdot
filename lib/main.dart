@@ -578,10 +578,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                       )
                     : ListView.builder(
                         controller: _scroll,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 14,
-                          vertical: 8,
-                        ),
+                        padding: const EdgeInsets.fromLTRB(14, 8, 14, 84),
                         itemCount: _messages.length + (_isOtherTyping ? 1 : 0),
                         itemBuilder: (_, i) {
                           if (_isOtherTyping && i == _messages.length) {
