@@ -582,8 +582,18 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                           horizontal: 14,
                           vertical: 8,
                         ),
-                        itemCount: _messages.length,
+                        itemCount: _messages.length + (_isOtherTyping ? 1 : 0),
                         itemBuilder: (_, i) {
+                          if (_isOtherTyping && i == _messages.length) {
+                            return Padding(
+                              padding: const EdgeInsets.only(top: 4, bottom: 2),
+                              child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: TypingDots(nickname: _typingNickname),
+                              ),
+                            );
+                          }
+
                           final msg = _messages[i];
                           return MessageBubble(
                             message: msg,
@@ -592,14 +602,6 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                         },
                       ),
               ),
-              if (_isOtherTyping)
-                Padding(
-                  padding: const EdgeInsets.only(left: 20, bottom: 6),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: TypingDots(nickname: _typingNickname),
-                  ),
-                ),
               Padding(
                 padding: EdgeInsets.only(
                   left: 12,
